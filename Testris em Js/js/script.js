@@ -45,7 +45,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let nextForm;
 
-
   const L = [
     [1, width + 1, width * 2 + 1, 2],
     [width, width + 1, width + 2, width * 2 + 2],
@@ -87,7 +86,17 @@ document.addEventListener("DOMContentLoaded", () => {
     "radial-gradient(circle, rgba(231,76,60,1) 0%, rgba(192,57,43,1) 100%)",
   ];
 
- 
+  const footballPlayers = [
+    "Messi",
+    "Ronaldo",
+    "Neymar",
+    "Mbappe",
+    "Haaland",
+    "Lewandowski",
+    "Salah",
+    "De Bruyne",
+  ];
+
   function genTetromino() {
     position = 4;
     form =
@@ -100,7 +109,6 @@ document.addEventListener("DOMContentLoaded", () => {
     draw();
   }
 
- 
   function draw() {
     current.forEach((index) => {
       squares[position + index].classList.add("tetromino");
@@ -108,14 +116,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-
   function undraw() {
     current.forEach((index) => {
       squares[position + index].classList.remove("tetromino");
       squares[position + index].style.background = "";
     });
   }
-
 
   function control(e) {
     sndMove.play();
@@ -128,7 +134,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.keyCode in keyAction && timerId) keyAction[e.keyCode]();
   }
   document.addEventListener("keydown", control);
-
 
   function moveLeft() {
     const isLeftEdge = current.some(
@@ -201,16 +206,16 @@ document.addEventListener("DOMContentLoaded", () => {
       current.forEach((index) =>
         squares[position + index].classList.add("taken")
       );
-      
+
       genTetromino();
       previewShape();
-      
+
       addScore();
+      checkFootballPlayerBonus();
       gameOver();
     }
   }
 
-  
   function previewShape() {
     const previewSquares = document.querySelectorAll(".mini-grid div");
     const previewWidth = 4;
@@ -223,12 +228,12 @@ document.addEventListener("DOMContentLoaded", () => {
       [0, 1, previewWidth, previewWidth + 1], // O
       [1, previewWidth + 1, previewWidth * 2 + 1, previewWidth * 3 + 1], // I
     ];
-    
+
     previewSquares.forEach((square) => {
       square.classList.remove("tetromino");
       square.style.background = "";
     });
-    
+
     const previewCurrent = previewTetrominoes[nextForm];
     previewCurrent.forEach((index) => {
       previewSquares[previewPosition + index].classList.add("tetromino");
@@ -237,7 +242,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  
   function addScore() {
     for (let i = 0; i < squares.length - width; i += width) {
       const row = Array.from({ length: width }, (v, k) => i + k);
@@ -269,7 +273,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  
   function pauseGame() {
     if (timerId) {
       h1Title.innerHTML = "Game Paused!";
@@ -287,7 +290,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function playGame() {
     pauseGame();
-    
+
     squares.forEach((square, index) => {
       square.classList.remove("tetromino");
       squares[index].style.background = "";
@@ -295,19 +298,31 @@ document.addEventListener("DOMContentLoaded", () => {
         square.classList.remove("taken");
       }
     });
-    
+
     score = 0;
     level = 1;
     scoreboard.innerHTML = score;
     h1Title.innerHTML = "Tetris";
-    
+
     genTetromino();
     draw();
     previewShape();
     resumeGame();
   }
 
-  
+  function checkFootballPlayerBonus() {
+    const randomNumber = Math.floor(Math.random() * 100) + 1;
+    if (randomNumber <= 5) {
+      const randomPlayerIndex = Math.floor(
+        Math.random() * footballPlayers.length
+      );
+      const randomPlayer = footballPlayers[randomPlayerIndex];
+      alert(`Você encontrou ${randomPlayer}! Pontos de bônus concedidos!`);
+      score += 50;
+      scoreboard.innerHTML = score;
+    }
+  }
+
   function gameOver() {
     if (
       current.some((index) =>
@@ -329,7 +344,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  
   buttonPause.addEventListener("click", () => {
     if (timerId) {
       pauseGame();
@@ -341,7 +355,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   buttonReset.addEventListener("click", () => {
-    
     playGame();
     buttonAbout.style.width = "40px";
     buttonReset.style.width = "40px";
@@ -381,7 +394,7 @@ document.addEventListener("DOMContentLoaded", () => {
       sndBackground.volume = 0;
       sndGameOver.volume = 0;
       sndMove.volume = 0;
-      sndScore.volume = 0;
+      sndScore.volume = 0.8;
       buttonMute.innerHTML = "Unmute";
     } else {
       sndBackground.play();
